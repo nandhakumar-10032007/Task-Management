@@ -10,7 +10,7 @@ function App() {
   // FETCH TASKS
   const fetchTasks = async () => {
 
-    const response = await fetch('http://localhost:5000/api/tasks');
+    const response = await fetch('https://task-management-8k74.onrender.com/api/tasks');
 
     const data = await response.json();
 
@@ -33,7 +33,7 @@ function App() {
 
     if (!title) return;
 
-    await fetch('http://localhost:5000/api/tasks', {
+    await fetch('https://task-management-8k74.onrender.com/api/tasks', {
 
       method: 'POST',
 
@@ -58,7 +58,7 @@ function App() {
   // DELETE TASK
   const deleteTask = async (id) => {
 
-    await fetch(`http://localhost:5000/api/tasks/${id}`, {
+    await fetch(`https://task-management-8k74.onrender.com/api/tasks/${id}`, {
 
       method: 'DELETE'
 
@@ -73,7 +73,7 @@ function App() {
   // UPDATE STATUS
   const updateStatus = async (id) => {
 
-    await fetch(`http://localhost:5000/api/tasks/${id}`, {
+    await fetch(`https://task-management-8k74.onrender.com/api/tasks/${id}`, {
 
       method: 'PUT'
 
