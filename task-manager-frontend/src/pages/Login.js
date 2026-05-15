@@ -2,212 +2,225 @@ import { useState } from 'react';
 
 function Login() {
 
-  const [email, setEmail] = useState('');
+    const [email, setEmail] =
+        useState('');
 
-  const [password, setPassword] = useState('');
+    const [password, setPassword] =
+        useState('');
 
 
 
-  const handleLogin = async () => {
+    const handleLogin = async () => {
 
-    try {
+        try {
 
-      const response = await fetch(
-        'https://task-management-8k74.onrender.com/api/login',
-        {
+            const response = await fetch(
 
-          method: 'POST',
+                'https://task-management-8k74.onrender.com/api/login',
 
-          headers: {
-            'Content-Type': 'application/json'
-          },
+                {
 
-          body: JSON.stringify({
+                    method: 'POST',
 
-            email,
-            password
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
 
-          })
+                    body: JSON.stringify({
+
+                        email,
+                        password
+
+                    })
+
+                }
+
+            );
+
+
+
+            const data =
+                await response.json();
+
+            console.log(data);
+
+
+
+            if (data.token) {
+
+                localStorage.setItem(
+                    'token',
+                    data.token
+                );
+
+                localStorage.setItem(
+                    'user',
+                    JSON.stringify(data.user)
+                );
+
+                alert('Login Success');
+
+                window.location.reload();
+
+            } else {
+
+                alert(
+                    data.message ||
+                    'Login Failed'
+                );
+
+            }
+
+        } catch (error) {
+
+            console.log(error);
+
+            alert('Server Error');
 
         }
-      );
+
+    };
 
 
 
-      const data = await response.json();
+    return (
 
-      console.log(data);
+        <div style={styles.container}>
 
+            <h1 style={styles.heading}>
+                Welcome Back 👋
+            </h1>
 
-
-      if (response.ok) {
-
-        localStorage.setItem(
-          'token',
-          data.token
-        );
-
-        localStorage.setItem(
-          'user',
-          JSON.stringify(data.user)
-        );
-
-        alert('Login Successful');
-
-        window.location.reload();
-
-      } else {
-
-        alert(data.message);
-
-      }
-
-    } catch (error) {
-
-      console.log(error);
-
-      alert('Login Failed');
-
-    }
-
-  };
+            <p style={styles.subheading}>
+                Login to continue
+            </p>
 
 
 
-  return (
-
-    <div style={styles.container}>
-
-      <h1 style={styles.title}>
-        Welcome Back 👋
-      </h1>
-
-      <p style={styles.subtitle}>
-        Login to continue
-      </p>
+            <input
+                type="email"
+                placeholder="Enter Email"
+                value={email}
+                onChange={(e) =>
+                    setEmail(e.target.value)
+                }
+                style={styles.input}
+            />
 
 
 
-      <input
-        type="email"
-        placeholder="Enter Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        style={styles.input}
-      />
+            <input
+                type="password"
+                placeholder="Enter Password"
+                value={password}
+                onChange={(e) =>
+                    setPassword(e.target.value)
+                }
+                style={styles.input}
+            />
 
 
 
-      <input
-        type="password"
-        placeholder="Enter Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        style={styles.input}
-      />
+            <button
+                onClick={handleLogin}
+                style={styles.button}
+            >
+                Login
+            </button>
 
+        </div>
 
+    );
 
-      <button
-        onClick={handleLogin}
-        style={styles.button}
-      >
-        Login
-      </button>
-
-    </div>
-
-  );
 }
 
 
 
 const styles = {
 
-  container: {
+    container: {
 
-    width: '100%',
+        width: '100%',
 
-    backgroundColor: 'white',
+        backgroundColor: 'white',
 
-    padding: '50px',
+        padding: '40px',
 
-    borderRadius: '20px',
+        borderRadius: '20px',
 
-    boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+        boxShadow:
+            '0 10px 30px rgba(0,0,0,0.2)',
 
-    display: 'flex',
+        display: 'flex',
 
-    flexDirection: 'column',
+        flexDirection: 'column',
 
-    gap: '20px',
-
-    boxSizing: 'border-box'
-  },
-
-
-
-  title: {
-
-    textAlign: 'center',
-
-    color: '#243b55',
-
-    margin: 0,
-
-    fontSize: '45px'
-  },
+        gap: '20px'
+    },
 
 
 
-  subtitle: {
+    heading: {
 
-    textAlign: 'center',
+        margin: 0,
 
-    color: 'gray',
+        color: '#243b55',
 
-    marginBottom: '20px',
+        textAlign: 'center',
 
-    fontSize: '18px'
-  },
-
-
-
-  input: {
-
-    padding: '18px',
-
-    borderRadius: '12px',
-
-    border: '1px solid #ccc',
-
-    fontSize: '17px',
-
-    outline: 'none',
-
-    backgroundColor: '#f1f5f9'
-  },
+        fontSize: '45px'
+    },
 
 
 
-  button: {
+    subheading: {
 
-    padding: '18px',
+        margin: 0,
 
-    borderRadius: '12px',
+        textAlign: 'center',
 
-    border: 'none',
+        color: '#666',
 
-    backgroundColor: '#243b55',
+        fontSize: '20px'
+    },
 
-    color: 'white',
 
-    fontSize: '18px',
 
-    fontWeight: 'bold',
+    input: {
 
-    cursor: 'pointer'
-  }
+        padding: '18px',
+
+        borderRadius: '12px',
+
+        border: '1px solid #ccc',
+
+        fontSize: '17px',
+
+        outline: 'none',
+
+        backgroundColor: '#f5f7fa'
+    },
+
+
+
+    button: {
+
+        padding: '18px',
+
+        border: 'none',
+
+        borderRadius: '12px',
+
+        backgroundColor: '#243b55',
+
+        color: 'white',
+
+        fontSize: '18px',
+
+        fontWeight: 'bold',
+
+        cursor: 'pointer'
+    }
 
 };
 
