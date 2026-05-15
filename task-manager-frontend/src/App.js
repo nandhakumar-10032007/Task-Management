@@ -95,47 +95,46 @@ function App() {
 
   const deleteTask = async (id) => {
 
-    await fetch(
-      'https://task-management-8k74.onrender.com/api/tasks',
-      {
+  await fetch(
+    `https://task-management-8k74.onrender.com/api/tasks/${id}`,
+    {
 
-        method: 'DELETE',
+      method: 'DELETE',
 
-        headers: {
-          Authorization: token
-        }
+      headers: {
+
+        Authorization: token
 
       }
-    );
 
-    fetchTasks();
-  };
+    }
+  );
 
-
+  fetchTasks();
+};
 
 
   // ================= UPDATE STATUS =================
 
   const updateStatus = async (id) => {
 
-    await fetch(
-      'https://task-management-8k74.onrender.com/api/tasks',
-      {
+  await fetch(
+    `https://task-management-8k74.onrender.com/api/tasks/${id}`,
+    {
 
-        method: 'PUT',
+      method: 'PUT',
 
-        headers: {
-          Authorization: token
-        }
+      headers: {
+
+        Authorization: token
 
       }
-    );
 
-    fetchTasks();
-  };
+    }
+  );
 
-
-
+  fetchTasks();
+};
 
   // ================= LOGOUT =================
 
