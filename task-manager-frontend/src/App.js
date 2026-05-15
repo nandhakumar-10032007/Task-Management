@@ -1,21 +1,49 @@
-import { useEffect, useState } from 'react';
+import {
+  useEffect,
+  useState,
+  useCallback
+} from 'react';
+
+import Login from './pages/Login';
+import Register from './pages/Register';
 
 function App() {
 
+  const [token, setToken] = useState(
+    localStorage.getItem('token')
+  );
+
+  const [showRegister, setShowRegister] =
+    useState(false);
+
   const [tasks, setTasks] = useState([]);
+
   const [title, setTitle] = useState('');
 
 
 
-  // FETCH TASKS
-  const fetchTasks = async () => {
+  // ================= FETCH TASKS =================
 
-    const response = await fetch('https://task-management-8k74.onrender.com/api/tasks');
+  const fetchTasks = useCallback(async () => {
+
+    if (!token) return;
+
+    const response = await fetch(
+      'http://localhost:5000/api/tasks',
+      {
+
+        headers: {
+          Authorization: token
+        }
+
+      }
+    );
 
     const data = await response.json();
 
     setTasks(data);
-  };
+
+  }, [token]);
 
 
 
@@ -23,29 +51,37 @@ function App() {
 
     fetchTasks();
 
-  }, []);
+  }, [fetchTasks]);
 
 
 
 
-  // ADD TASK
+  // ================= ADD TASK =================
+
   const addTask = async () => {
 
     if (!title) return;
 
-    await fetch('https://task-management-8k74.onrender.com/api/tasks', {
+    await fetch(
+      'http://localhost:5000/api/tasks',
+      {
 
-      method: 'POST',
+        method: 'POST',
 
-      headers: {
-        'Content-Type': 'application/json'
-      },
+        headers: {
 
-      body: JSON.stringify({
-        title
-      })
+          'Content-Type': 'application/json',
 
-    });
+          Authorization: token
+
+        },
+
+        body: JSON.stringify({
+          title
+        })
+
+      }
+    );
 
     setTitle('');
 
@@ -55,14 +91,22 @@ function App() {
 
 
 
-  // DELETE TASK
+  // ================= DELETE TASK =================
+
   const deleteTask = async (id) => {
 
-    await fetch(`https://task-management-8k74.onrender.com/api/tasks/${id}`, {
+    await fetch(
+      `http://localhost:5000/api/tasks/${id}`,
+      {
 
-      method: 'DELETE'
+        method: 'DELETE',
 
-    });
+        headers: {
+          Authorization: token
+        }
+
+      }
+    );
 
     fetchTasks();
   };
@@ -70,20 +114,118 @@ function App() {
 
 
 
-  // UPDATE STATUS
+  // ================= UPDATE STATUS =================
+
   const updateStatus = async (id) => {
 
-    await fetch(`https://task-management-8k74.onrender.com/api/tasks/${id}`, {
+    await fetch(
+      `http://localhost:5000/api/tasks/${id}`,
+      {
 
-      method: 'PUT'
+        method: 'PUT',
 
-    });
+        headers: {
+          Authorization: token
+        }
+
+      }
+    );
 
     fetchTasks();
   };
 
 
 
+
+  // ================= LOGOUT =================
+
+  const logout = () => {
+
+    localStorage.removeItem('token');
+
+    localStorage.removeItem('user');
+
+    setToken(null);
+
+    window.location.reload();
+  };
+
+
+
+
+  // ================= AUTH PAGE =================
+
+  if (!token) {
+
+    return (
+
+      <div style={styles.authContainer}>
+
+        <div style={styles.authCard}>
+
+          {showRegister ? (
+
+            <>
+
+              <Register />
+
+              <div style={styles.bottomSwitch}>
+
+                <p style={styles.bottomText}>
+                  Already have an account?
+                </p>
+
+                <button
+                  style={styles.bottomButton}
+                  onClick={() =>
+                    setShowRegister(false)
+                  }
+                >
+                  Login
+                </button>
+
+              </div>
+
+            </>
+
+          ) : (
+
+            <>
+
+              <Login />
+
+              <div style={styles.bottomSwitch}>
+
+                <p style={styles.bottomText}>
+                  Don't have an account?
+                </p>
+
+                <button
+                  style={styles.bottomButton}
+                  onClick={() =>
+                    setShowRegister(true)
+                  }
+                >
+                  Create Account
+                </button>
+
+              </div>
+
+            </>
+
+          )}
+
+        </div>
+
+      </div>
+
+    );
+  }
+
+
+
+
+  // ================= TASK PAGE =================
 
   return (
 
@@ -91,9 +233,20 @@ function App() {
 
       <div style={styles.card}>
 
-        <h1 style={styles.heading}>
-          Task Manager
-        </h1>
+        <div style={styles.topBar}>
+
+          <h1 style={styles.heading}>
+            Task Manager
+          </h1>
+
+          <button
+            onClick={logout}
+            style={styles.logoutButton}
+          >
+            Logout
+          </button>
+
+        </div>
 
 
 
@@ -103,7 +256,9 @@ function App() {
             type="text"
             placeholder="Enter your task..."
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) =>
+              setTitle(e.target.value)
+            }
             style={styles.input}
           />
 
@@ -135,22 +290,27 @@ function App() {
                 </h2>
 
                 <p style={styles.taskStatus}>
+
                   Status:
+
                   <span
                     style={{
+
                       color:
-                        task.status === 'Completed'
+                        task.status ===
+                        'Completed'
                           ? 'green'
                           : 'orange',
 
                       marginLeft: '8px',
+
                       fontWeight: 'bold'
                     }}
                   >
                     {task.status}
                   </span>
-                </p>
 
+                </p>
               </div>
 
 
@@ -159,14 +319,18 @@ function App() {
               <div style={styles.buttonGroup}>
 
                 <button
-                  onClick={() => updateStatus(task._id)}
+                  onClick={() =>
+                    updateStatus(task._id)
+                  }
                   style={styles.updateButton}
                 >
                   Change Status
                 </button>
 
                 <button
-                  onClick={() => deleteTask(task._id)}
+                  onClick={() =>
+                    deleteTask(task._id)
+                  }
                   style={styles.deleteButton}
                 >
                   Delete
@@ -183,6 +347,7 @@ function App() {
       </div>
 
     </div>
+
   );
 }
 
@@ -190,11 +355,92 @@ function App() {
 
 const styles = {
 
+  authContainer: {
+
+    minHeight: '100vh',
+
+    display: 'flex',
+
+    justifyContent: 'center',
+
+    alignItems: 'center',
+
+    background:
+      'linear-gradient(to right, #141e30, #243b55)',
+
+    padding: '20px'
+  },
+
+
+
+  authCard: {
+
+    width: '100%',
+
+    maxWidth: '500px',
+
+    display: 'flex',
+
+    flexDirection: 'column',
+
+    alignItems: 'center'
+  },
+
+
+
+  bottomSwitch: {
+
+    marginTop: '20px',
+
+    display: 'flex',
+
+    flexDirection: 'column',
+
+    alignItems: 'center',
+
+    gap: '10px'
+  },
+
+
+
+  bottomText: {
+
+    color: 'white',
+
+    margin: 0,
+
+    fontSize: '16px'
+  },
+
+
+
+  bottomButton: {
+
+    padding: '10px 25px',
+
+    border: 'none',
+
+    borderRadius: '10px',
+
+    backgroundColor: '#ffc107',
+
+    color: '#000',
+
+    fontWeight: 'bold',
+
+    cursor: 'pointer',
+
+    fontSize: '15px'
+  },
+
+
+
   container: {
 
     minHeight: '100vh',
 
-    background: 'linear-gradient(to right, #141e30, #243b55)',
+    background:
+      'linear-gradient(to right, #141e30, #243b55)',
 
     display: 'flex',
 
@@ -219,20 +465,49 @@ const styles = {
 
     padding: '30px',
 
-    boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+    boxShadow:
+      '0 10px 30px rgba(0,0,0,0.3)'
+  },
+
+
+
+  topBar: {
+
+    display: 'flex',
+
+    justifyContent: 'space-between',
+
+    alignItems: 'center',
+
+    marginBottom: '30px'
   },
 
 
 
   heading: {
 
-    textAlign: 'center',
-
-    marginBottom: '30px',
-
     color: '#243b55',
 
-    fontSize: '40px'
+    fontSize: '40px',
+
+    margin: 0
+  },
+
+
+
+  logoutButton: {
+
+    padding: '10px 20px',
+
+    border: 'none',
+
+    borderRadius: '10px',
+
+    backgroundColor: '#dc3545',
+
+    color: 'white',
+
+    cursor: 'pointer'
   },
 
 
@@ -311,7 +586,8 @@ const styles = {
 
     alignItems: 'center',
 
-    boxShadow: '0 5px 15px rgba(0,0,0,0.1)'
+    boxShadow:
+      '0 5px 15px rgba(0,0,0,0.1)'
   },
 
 
@@ -376,7 +652,5 @@ const styles = {
   }
 
 };
-
-
 
 export default App;
